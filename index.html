@@ -17,7 +17,7 @@
     url("https://images.zola.com/7c175969-90ec-43fd-8b4c-53ca7cf7f8fb?w=2000");
 
     background-size: cover;
-    background-position: center;
+    background-position:  75% center;
     background-repeat: no-repeat;
 
     color: white;
@@ -77,6 +77,39 @@
       font-size: 16px;
       color: white;
     }
+    @media (max-width: 600px) {
+  body {
+    padding: 16px;
+    align-items: flex-end;
+    background-position: center top;
+  }
+
+  .card {
+    margin-top: 0;
+    margin-bottom: 40px;
+    max-width: 100%;
+    padding: 28px 20px;
+    border-radius: 22px;
+  }
+      
+  h1 {
+    font-size: 30px;
+    margin-top: 0;
+  }
+
+  p {
+    font-size: 18px;
+  }
+
+  .upload-button {
+    font-size: 21px;
+    padding: 20px;
+  }
+
+  #fileStatus {
+    font-size: 16px;
+  }
+}
   </style>
 </head>
 

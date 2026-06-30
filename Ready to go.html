@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedding Photo Upload</title>
+
+  <style>
+   body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
+    background-image: linear-gradient(
+        rgba(250,247,242,0),
+        rgba(250,247,242,0.5)
+    ),
+    url("https://images.zola.com/7c175969-90ec-43fd-8b4c-53ca7cf7f8fb?w=2000");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 20px;
+}
+
+    .card {
+      margin-top: 375px;
+      background: #AC5235;
+      padding: 32px 24px;
+      border-radius: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .upload-button {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      background: white;
+      color: #2b2b2b;
+      font-size: 22px;
+      font-weight: bold;
+      border: none;
+      border-radius: 16px;
+      
+      cursor: pointer;
+    }
+
+    .upload-button:active {
+      transform: scale(0.98);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #fileStatus {
+      margin-top: 20px;
+      font-size: 16px;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Share Your Photos</h1>
+    <p>Tap the button below and upload your favorite wedding pictures.</p>
+
+    <button class="upload-button" onclick="document.getElementById('photoUpload').click()">
+      Upload Photos
+    </button>
+
+    <input 
+      id="photoUpload" 
+      type="file" 
+      accept="image/*,video/*" 
+      multiple 
+      onchange="showSelectedFiles()"
+    />
+
+    <div id="fileStatus"></div>
+  </div>
+
+  <script>
+async function showSelectedFiles() {
+
+    const input = document.getElementById("photoUpload");
+    const status = document.getElementById("fileStatus");
+
+    if (input.files.length === 0) return;
+
+    status.textContent = "Uploading...";
+
+    try {
+
+        for (const file of input.files) {
+
+            const base64 = await fileToBase64(file);
+
+            await fetch(
+                "https://script.google.com/macros/s/AKfycby1vm-GD5U02ospdf8zJ7INWzlLVRGHrI9ITtpq_hB-pWt8uIigSg6C01TpUJ0xOwU/exec",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        file: base64,
+                        fileName: file.name,
+                        mimeType: file.type
+                    })
+                }
+            );
+        }
+
+        status.textContent = "✅ Upload complete! Thank you.";
+
+    } catch (err) {
+
+        console.error(err);
+        status.textContent = "❌ Upload failed. Please try again.";
+
+    }
+}
+
+function fileToBase64(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            resolve(
+                reader.result.split(",")[1]
+            );
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+    });
+}
+</script>
+</body>
+</html>

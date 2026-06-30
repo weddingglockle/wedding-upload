@@ -6,31 +6,42 @@
   <title>Wedding Photo Upload</title>
 
   <style>
-   body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #AC5235;
+      color: white;
+      min-height: 100vh;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-    background-image: linear-gradient(
-        rgba(250,247,242,0),
-        rgba(250,247,242,0.5)
-    ),
-    url("https://images.zola.com/7c175969-90ec-43fd-8b4c-53ca7cf7f8fb?w=2000");
+    .phone-frame {
+      width: 100%;
+      max-width: 562px;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
 
-    background-size: cover;
-    background-position:  75% center;
-    background-repeat: no-repeat;
+      background-image: linear-gradient(
+          rgba(250,247,242,0),
+          rgba(250,247,242,0.5)
+        ),
+        url("https://images.zola.com/7c175969-90ec-43fd-8b4c-53ca7cf7f8fb?w=2000");
 
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 20px;
-}
+      background-size: cover;
+      background-position: 60% center;
+      background-repeat: no-repeat;
+
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
 
     .card {
-      margin-top: 375px;
+      margin-bottom: 50px;
       background: #AC5235;
       padding: 32px 24px;
       border-radius: 24px;
@@ -60,7 +71,6 @@
       font-weight: bold;
       border: none;
       border-radius: 16px;
-      
       cursor: pointer;
     }
 
@@ -77,118 +87,110 @@
       font-size: 16px;
       color: white;
     }
+
     @media (max-width: 600px) {
-  body {
-    padding: 16px;
-    align-items: flex-end;
-    background-position: center top;
-  }
+      body {
+        background: #faf7f2;
+      }
 
-  .card {
-    margin-top: 0;
-    margin-bottom: 40px;
-    max-width: 100%;
-    padding: 28px 20px;
-    border-radius: 22px;
-  }
-      
-  h1 {
-    font-size: 30px;
-    margin-top: 0;
-  }
+      .phone-frame {
+        max-width: none;
+        width: 100%;
+        padding: 16px;
+        background-position: 65% center;
+      }
 
-  p {
-    font-size: 18px;
-  }
+      .card {
+        margin-bottom: 40px;
+        padding: 28px 20px;
+        border-radius: 22px;
+      }
 
-  .upload-button {
-    font-size: 21px;
-    padding: 20px;
-  }
+      h1 {
+        font-size: 30px;
+        margin-top: 0;
+      }
 
-  #fileStatus {
-    font-size: 16px;
-  }
-}
+      p {
+        font-size: 18px;
+      }
+
+      .upload-button {
+        font-size: 21px;
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>Test</h1>
-    <p>Tap the button below and upload your favorite wedding pictures.</p>
+  <div class="phone-frame">
+    <div class="card">
+      <h1>Test</h1>
+      <p>Tap the button below and upload your favorite wedding pictures.</p>
 
-    <button class="upload-button" onclick="document.getElementById('photoUpload').click()">
-      Upload Photos
-    </button>
+      <button class="upload-button" onclick="document.getElementById('photoUpload').click()">
+        Upload Photos
+      </button>
 
-    <input 
-      id="photoUpload" 
-      type="file" 
-      accept="image/*,video/*" 
-      multiple 
-      onchange="showSelectedFiles()"
-    />
+      <input 
+        id="photoUpload" 
+        type="file" 
+        accept="image/*,video/*" 
+        multiple 
+        onchange="showSelectedFiles()"
+      />
 
-    <div id="fileStatus"></div>
+      <div id="fileStatus"></div>
+    </div>
   </div>
 
   <script>
-async function showSelectedFiles() {
+    async function showSelectedFiles() {
+      const input = document.getElementById("photoUpload");
+      const status = document.getElementById("fileStatus");
 
-    const input = document.getElementById("photoUpload");
-    const status = document.getElementById("fileStatus");
+      if (input.files.length === 0) return;
 
-    if (input.files.length === 0) return;
+      status.textContent = "Uploading...";
 
-    status.textContent = "Uploading...";
-
-    try {
-
+      try {
         for (const file of input.files) {
+          const base64 = await fileToBase64(file);
 
-            const base64 = await fileToBase64(file);
-
-            await fetch(
-                "https://script.google.com/macros/s/AKfycby1vm-GD5U02ospdf8zJ7INWzlLVRGHrI9ITtpq_hB-pWt8uIigSg6C01TpUJ0xOwU/exec",
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-                        file: base64,
-                        fileName: file.name,
-                        mimeType: file.type
-                    })
-                }
-            );
+          await fetch(
+            "https://script.google.com/macros/s/AKfycby1vm-GD5U02ospdf8zJ7INWzlLVRGHrI9ITtpq_hB-pWt8uIigSg6C01TpUJ0xOwU/exec",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                file: base64,
+                fileName: file.name,
+                mimeType: file.type
+              })
+            }
+          );
         }
 
         status.textContent = "✅ Upload complete! Thank you.";
 
-    } catch (err) {
-
+      } catch (err) {
         console.error(err);
         status.textContent = "❌ Upload failed. Please try again.";
-
+      }
     }
-}
 
-function fileToBase64(file) {
-
-    return new Promise((resolve, reject) => {
-
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
         reader.onload = () => {
-            resolve(
-                reader.result.split(",")[1]
-            );
+          resolve(reader.result.split(",")[1]);
         };
 
         reader.onerror = reject;
-
         reader.readAsDataURL(file);
-    });
-}
-</script>
+      });
+    }
+  </script>
 </body>
 </html>
